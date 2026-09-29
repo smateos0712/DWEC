@@ -1,4 +1,4 @@
-const edad = 10;
+const edad = 8;
 const tieneEntrada = true;
 
 function validarAccesoTernario (edad, tieneEntrada) {
@@ -9,5 +9,6 @@ validarAccesoTernario(edad, tieneEntrada);
 
 let mensaje= edad >=18? "Mayor de edad" : "Menor de edad";
 console.log(mensaje);
-let categoria = edad <2? "Bebé":edad <12? "Adoslescente":edad <18? "Joven":"Adulto";
+
+let categoria = edad <2? "Bebé":edad <12? "Niño":edad <18? "Adolescente":"Adulto";
 console.log(categoria);

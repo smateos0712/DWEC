@@ -57,38 +57,10 @@ document.querySelector('#app').innerHTML = `
 <section id="spacer"></section>
 `
 
-setupCounter(document.querySelector('#counter'))
 import {
   catalogo,
-  buscarId,
-  calcularPrecioPorEstado,
-  descuentoPorVolumen,
-  tieneStockBajo,
+  buscarProducto,
 } from "./catalogo.js";
 
-const chronoTrigger = {
-  id: 13,
-  titulo: "Chrono Trigger",
-  plataforma: "SNES",
-  categoria: "RPG",
-  precioBase: 45,
-  estado: "usado-como-nuevo",
-  stock: 4,
-};
 
-const streetsOfRage = {
-  id: 14,
-  titulo: "Streets of Rage 2",
-  plataforma: "MEGA DRIVE",
-  categoria: "Lucha",
-  precioBase: 60,
-  estado: "nuevo-precintado",
-  stock: 10,
-};
-
-console.log("Buscar id 4:", buscarId(4));
-console.log("Precio por estado Streets of Rage:", calcularPrecioPorEstado(streetsOfRage));
-console.log("Caso 1:", descuentoPorVolumen(chronoTrigger, 3));
-console.log("Caso 2:", descuentoPorVolumen(streetsOfRage, 4));
-console.log("Stock bajo Mario:", tieneStockBajo(catalogo[0]));
-console.log("Stock bajo Street Fighter:", tieneStockBajo(catalogo[3]));
+buscarProducto(catalogo);

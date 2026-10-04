@@ -109,10 +109,6 @@ const catalogo = [
   },
 ];
 
-//para buscar el producto dentro del catalogo a través del id
-function buscarId(idBuscado) {
-  return catalogo.find((producto) => producto.id === idBuscado);
-}
 //para calcular el precio del producto según el estado
 function calcularPrecioPorEstado (producto) {
   let nuevoPrecio;
@@ -145,4 +141,52 @@ function tieneStockBajo(producto) {
   return producto.stock < 3;
 }
 
-export { catalogo, buscarId, calcularPrecioPorEstado, descuentoPorVolumen, tieneStockBajo };
+//ver todo el catalogo
+function mostrarCatalogo(productos) {
+  const linea=productos.map(
+    (producto) => producto.id +".- " + producto.titulo + " (" + producto.plataforma + ") - Stock: " + producto.stock
+  );
+  console.log(linea.join("\n"));
+}
+//1.- VER CATALOGO
+//filtrar por categoria
+function mostrarPorCategoria(productos, categoria) {
+  const filtrados = productos.filter((producto) => producto.categoria === categoria);
+  mostrarCatalogo(filtrados);
+}
+
+//mostrar productos con stock bajo
+function mostrarStockBajo(productos) {
+  const conStockBajo = productos.filter((producto) => producto.stock < 3);
+  mostrarCatalogo(conStockBajo);
+}
+
+// 2.- BUSCAR PRODUCTO
+//funcion para buscar un producto por id o por nombre
+function buscarProducto(productos){
+  //Number sirve para convertir a numero lo que introducimos por teclado en modo texto, como el ParseInt de java
+  const eleccion = Number(prompt("Elige una opción:\n1.- Id \n2.- Título"));
+  let buscado;
+  
+  if(eleccion===1){
+    const id = Number(prompt("Introduce el id: "));
+    buscado = productos.find((producto)=> producto.id===id);
+  } else if(eleccion===2){
+    const nombre = prompt("Introduce el título:");
+    buscado = productos.find((producto)=> producto.titulo.toLowerCase().includes(nombre.toLowerCase()));
+  } else{
+    console.log("Opción no valida")
+    return;
+  }
+
+  //si no se encuentra el producto mostramos mensaje por pantalla ya que en la practica dice que nada de undefined por pantalla
+  if(buscado === undefined){
+    console.log("No se ha encontrado ningún producto")
+    //sino se muestra el producto buscado
+  } else{
+    mostrarCatalogo([buscado]);
+  }
+}
+
+//exportaciones al main para hacer pruebas
+export { catalogo, calcularPrecioPorEstado, descuentoPorVolumen, tieneStockBajo, mostrarCatalogo, buscarProducto};

@@ -109,7 +109,40 @@ const catalogo = [
   },
 ];
 
-
-function reglasNegocio(idBuscado){
-    const juegoBuscado=catalogo.find((producto)=>producto.id===idBuscado);
+//para buscar el producto dentro del catalogo a través del id
+function buscarId(idBuscado) {
+  return catalogo.find((producto) => producto.id === idBuscado);
 }
+//para calcular el precio del producto según el estado
+function calcularPrecioPorEstado (producto) {
+  let nuevoPrecio;
+  if (producto.estado === "nuevo-precintado"){
+    nuevoPrecio = producto.precioBase + producto.precioBase *0.25;
+  } else if (producto.estado==="usado-como-nuevo"){
+      nuevoPrecio = producto.precioBase;
+  } else if (producto.estado === "usado-caja-danada"){
+      nuevoPrecio = producto.precioBase - producto.precioBase *0.15;
+  } else if (producto.estado==="solo-cartucho"){
+      nuevoPrecio = producto.precioBase - producto.precioBase *0.3;
+  }
+  return nuevoPrecio;
+}
+//para calcular el descuento según la cantidad de compra de un mismo producto
+function descuentoPorVolumen (producto, cantidad) {
+  let nuevoPrecio;
+  if (cantidad===1){
+    nuevoPrecio=calcularPrecioPorEstado(producto);
+  } else if (cantidad === 2 || cantidad === 3){
+    nuevoPrecio=calcularPrecioPorEstado(producto) - calcularPrecioPorEstado(producto)*0.05;
+  } else if (cantidad>=4) {
+    nuevoPrecio=calcularPrecioPorEstado(producto) - calcularPrecioPorEstado(producto)*0.1;
+  }
+  //Devuelvo el precio final redondeado a dos decimales
+  return Math.round(nuevoPrecio * 100) / 100;
+}
+//Funcion boolean que comprueba si el stock del producto es menor que 3
+function tieneStockBajo(producto) {
+  return producto.stock < 3;
+}
+
+export { catalogo, buscarId, calcularPrecioPorEstado, descuentoPorVolumen, tieneStockBajo };

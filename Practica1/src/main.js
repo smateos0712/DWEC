@@ -59,8 +59,11 @@ document.querySelector('#app').innerHTML = `
 
 import {
   catalogo,
-  buscarProducto,
 } from "./catalogo.js";
+
+import {
+  buscarProducto,
+} from "./menu.js";
 
 
 buscarProducto(catalogo);

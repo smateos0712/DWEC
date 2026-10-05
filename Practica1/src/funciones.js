@@ -133,6 +133,54 @@ function reponerStock(catalogo,id,cantidad){
 }
 
 //5.- INFORME DE CAJA
+//para contar cuántas unidades se han vendido de un juego en toda la sesión
+function unidadesVendidas(ventas, titulo) {
+  //me quedo solo con las ventas de ese juego
+  const ventasDelJuego = ventas.filter((venta) => venta.titulo === titulo);
+  //sumo las cantidades de esas ventas
+  return ventasDelJuego.reduce((acumulado, venta) => acumulado + venta.cantidad, 0);
+}
 
+//para mostrar el informe de caja con el total facturado, el más vendido, el valor del stock y el aviso de stock bajo
+function informeCaja(productos, ventas) {
+  //total facturado: sumo el total de cada venta
+  const totalFacturado = ventas.reduce((acumulado, venta) => acumulado + venta.total, 0);
+
+  //producto más vendido: recorro los juegos y me quedo con el que tenga más unidades vendidas
+  const masVendido = productos.reduce((mejor, producto) => {
+    if (unidadesVendidas(ventas, producto.titulo) > unidadesVendidas(ventas, mejor.titulo)) {
+      return producto;
+    } else {
+      return mejor;
+    }
+  }, productos[0]);
+  const unidadesMasVendido = unidadesVendidas(ventas, masVendido.titulo);
+
+  //valor del stock restante: precio de venta por stock de cada juego, todo sumado
+  const valorStock = productos.reduce(
+    (acumulado, producto) => acumulado + calcularPrecioPorEstado(producto) * producto.stock,
+    0,
+  );
+
+  //compruebo si queda algún juego con stock bajo
+  const hayStockBajo = productos.some((producto) => tieneStockBajo(producto));
+
+  //muestro el informe
+  console.log("===== INFORME DE CAJA =====");
+  console.log("Total facturado: " + totalFacturado.toFixed(2) + " €");
+
+  //si no se ha vendido nada, no hay producto más vendido
+  if (unidadesMasVendido === 0) {
+    console.log("Producto más vendido: ninguno");
+  } else {
+    console.log("Producto más vendido: " + masVendido.titulo + " (" + unidadesMasVendido + " unidades)");
+  }
+
+  console.log("Valor del stock restante: " + valorStock.toFixed(2) + " €");
+
+  if (hayStockBajo) {
+    console.log("⚠️ Hay productos con stock bajo");
+  }
+}
 //exportaciones al main para hacer pruebas
 export { mostrarCatalogo,buscarProducto, actualizarStock, reponerStock, registrarVenta};

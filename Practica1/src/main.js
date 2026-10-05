@@ -63,7 +63,11 @@ import {
 
 import {
   buscarProducto,
-} from "./menu.js";
+  registrarVenta,
+  reponerStock,
+  actualizarStock,
+} from "./funciones.js";
 
 
-buscarProducto(catalogo);
+registrarVenta(catalogo[4],2);
+//console.log(reponerStock(catalogo,3,5));

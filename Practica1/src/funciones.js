@@ -77,5 +77,45 @@ function buscarProducto(productos){
   }
 }
 
+// 3.- REGISTRAR UNA VENTA
+function registrarVenta(producto, cantidad){
+  let precioFinal;
+  
+  if (producto.stock < cantidad ){
+    console.log("No hay stock suficiente");
+    return
+  } else{
+    precioFinal= descuentoPorVolumen(producto,cantidad);  
+  }
+  console.log("El precio de la venta es de: " +precioFinal + "€");
+  return precioFinal;
+}
+//funcion que devuelve un catalogo nuevo para no modificar el original
+function actualizarStock(catalogo,id,cantidad){
+  const nuevoCatalogo = catalogo.map((juego) => {
+  if (juego.id===id){
+    //los 3 puntos significa añade todo lo anterior del producto pero cambia esto
+    return {...juego,stock:juego.stock - cantidad};
+    } else {
+
+      return juego;
+    }   
+  });
+  return nuevoCatalogo;
+}
+//4.- REPONER STOCK
+//funcion que devuelve un catalogo nuevo para no modificar el original
+function reponerStock(catalogo,id,cantidad){
+  const nuevoCatalogo = catalogo.map((juego) => {
+  if (juego.id===id){
+    //los 3 puntos significa añade todo lo anterior del producto pero cambia esto
+    return {...juego,stock:juego.stock + cantidad};
+    } else {
+
+      return juego;
+    }   
+  });
+  return nuevoCatalogo;
+}
 //exportaciones al main para hacer pruebas
-export { buscarProducto};
+export { buscarProducto, actualizarStock, reponerStock, registrarVenta};

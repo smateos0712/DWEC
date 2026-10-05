@@ -58,26 +58,8 @@ document.querySelector('#app').innerHTML = `
 `
 
 import {
-  catalogo,
-} from "./catalogo.js";
+  iniciarMenu,
+} from "./menu.js";
 
-import {
-  mostrarCatalogo,
-  buscarProducto,
-  registrarVenta,
-  reponerStock,
-  actualizarStock,
-} from "./funciones.js";
-import {
-  ventas,
-} from "./ventas.js";
+iniciarMenu();
 
-registrarVenta(catalogo,catalogo[3],2);
-registrarVenta(catalogo,catalogo[4],1);
-registrarVenta(catalogo,catalogo[2],3);
-registrarVenta(catalogo,catalogo[4],2);
-
-
-mostrarCatalogo(actualizarStock(catalogo,catalogo[3].id,1));
-console.log(ventas);
-//console.log(reponerStock(catalogo,3,5));.

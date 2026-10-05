@@ -47,7 +47,7 @@ function mostrarCatalogo(productos) {
 }
 //filtrar por categoria
 function mostrarPorCategoria(productos, categoria) {
-  const filtrados = productos.filter((producto) => producto.categoria === categoria);
+  const filtrados = productos.filter((producto) => producto.categoria.toLowerCase() === categoria.toLowerCase());
   mostrarCatalogo(filtrados);
 }
 
@@ -183,4 +183,4 @@ function informeCaja(productos, ventas) {
   }
 }
 //exportaciones al main para hacer pruebas
-export { mostrarCatalogo,buscarProducto, actualizarStock, reponerStock, registrarVenta};
+export { mostrarCatalogo, mostrarPorCategoria, mostrarStockBajo, buscarProducto, actualizarStock, reponerStock, registrarVenta, informeCaja };

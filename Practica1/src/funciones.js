@@ -1,3 +1,5 @@
+import { guardaVenta } from "./ventas";
+
 //para calcular el precio del producto según el estado
 function calcularPrecioPorEstado (producto) {
   let nuevoPrecio;
@@ -30,14 +32,19 @@ function tieneStockBajo(producto) {
   return producto.stock < 3;
 }
 
+
+//1.- VER CATALOGO
+
 //ver todo el catalogo
 function mostrarCatalogo(productos) {
   const linea=productos.map(
-    (producto) => producto.id +".- " + producto.titulo + " (" + producto.plataforma + ") - Stock: " + producto.stock
+    (producto) =>{
+      const aviso = tieneStockBajo(producto)?"STOCK BAJO":""
+      return producto.id +".- " + producto.titulo + " (" + producto.plataforma + ") - Stock: " + producto.stock +" " +aviso;
+    } 
   );
   console.log(linea.join("\n"));
 }
-//1.- VER CATALOGO
 //filtrar por categoria
 function mostrarPorCategoria(productos, categoria) {
   const filtrados = productos.filter((producto) => producto.categoria === categoria);
@@ -78,17 +85,24 @@ function buscarProducto(productos){
 }
 
 // 3.- REGISTRAR UNA VENTA
-function registrarVenta(producto, cantidad){
-  let precioFinal;
-  
-  if (producto.stock < cantidad ){
+function registrarVenta(productos, producto, cantidad) {
+  let precioUnitario;
+
+  if (producto.stock < cantidad) {
     console.log("No hay stock suficiente");
-    return
-  } else{
-    precioFinal= descuentoPorVolumen(producto,cantidad);  
+    return productos;
+  } else {
+    precioUnitario = descuentoPorVolumen(producto, cantidad);
   }
-  console.log("El precio de la venta es de: " +precioFinal + "€");
-  return precioFinal;
+
+  const total = Math.round(precioUnitario * cantidad * 100) / 100;
+
+  console.log("Precio unitario: " + precioUnitario + " €");
+  console.log("Total de la venta: " + total + " €");
+  console.log("Stock restante: " + (producto.stock - cantidad));
+
+  guardaVenta({titulo: producto.titulo, cantidad: cantidad, total: total });
+  return actualizarStock(productos, producto.id, cantidad);
 }
 //funcion que devuelve un catalogo nuevo para no modificar el original
 function actualizarStock(catalogo,id,cantidad){
@@ -117,5 +131,8 @@ function reponerStock(catalogo,id,cantidad){
   });
   return nuevoCatalogo;
 }
+
+//5.- INFORME DE CAJA
+
 //exportaciones al main para hacer pruebas
-export { buscarProducto, actualizarStock, reponerStock, registrarVenta};
+export { mostrarCatalogo,buscarProducto, actualizarStock, reponerStock, registrarVenta};

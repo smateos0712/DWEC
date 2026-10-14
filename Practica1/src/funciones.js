@@ -1,4 +1,5 @@
-import { guardaVenta } from "./ventas";
+let ventas = [];
+
 
 //para calcular el precio del producto según el estado
 function calcularPrecioPorEstado (producto) {
@@ -32,22 +33,17 @@ function tieneStockBajo(producto) {
   return producto.stock < 3;
 }
 
-
-//1.- VER CATALOGO
-
 //ver todo el catalogo
 function mostrarCatalogo(productos) {
   const linea=productos.map(
-    (producto) =>{
-      const aviso = tieneStockBajo(producto)?"STOCK BAJO":""
-      return producto.id +".- " + producto.titulo + " (" + producto.plataforma + ") - Stock: " + producto.stock +" " +aviso;
-    } 
+    (producto) => producto.id +".- " + producto.titulo + " (" + producto.plataforma + ") - Stock: " + producto.stock
   );
   console.log(linea.join("\n"));
 }
+//1.- VER CATALOGO
 //filtrar por categoria
 function mostrarPorCategoria(productos, categoria) {
-  const filtrados = productos.filter((producto) => producto.categoria.toLowerCase() === categoria.toLowerCase());
+  const filtrados = productos.filter((producto) => producto.categoria === categoria);
   mostrarCatalogo(filtrados);
 }
 
@@ -85,24 +81,19 @@ function buscarProducto(productos){
 }
 
 // 3.- REGISTRAR UNA VENTA
-function registrarVenta(productos, producto, cantidad) {
-  let precioUnitario;
-
-  if (producto.stock < cantidad) {
+function registrarVenta(producto, cantidad){
+  let precioFinal;
+  
+  if (producto.stock < cantidad ){
     console.log("No hay stock suficiente");
-    return productos;
-  } else {
-    precioUnitario = descuentoPorVolumen(producto, cantidad);
+    return
+  } else{
+    precioFinal= Math.round(descuentoPorVolumen(producto,cantidad)*cantidad*100)/100;  
   }
-
-  const total = Math.round(precioUnitario * cantidad * 100) / 100;
-
-  console.log("Precio unitario: " + precioUnitario + " €");
-  console.log("Total de la venta: " + total + " €");
-  console.log("Stock restante: " + (producto.stock - cantidad));
-
-  guardaVenta({titulo: producto.titulo, cantidad: cantidad, total: total });
-  return actualizarStock(productos, producto.id, cantidad);
+  console.log("El precio de la venta es de: " +precioFinal + "€");
+  //guardamos la venta en un array nuevo
+  ventas = [...ventas, {id: producto.id, nombre: producto.titulo, cantidad: cantidad, total: precioFinal}];
+  return precioFinal;
 }
 //funcion que devuelve un catalogo nuevo para no modificar el original
 function actualizarStock(catalogo,id,cantidad){
@@ -119,68 +110,54 @@ function actualizarStock(catalogo,id,cantidad){
 }
 //4.- REPONER STOCK
 //funcion que devuelve un catalogo nuevo para no modificar el original
-function reponerStock(catalogo,id,cantidad){
-  const nuevoCatalogo = catalogo.map((juego) => {
-  if (juego.id===id){
-    //los 3 puntos significa añade todo lo anterior del producto pero cambia esto
-    return {...juego,stock:juego.stock + cantidad};
-    } else {
-
+function reponerStock (catalogo, producto, cantidad){
+  const nuevoCatalogo = catalogo.map ((juego)=> {
+    if (juego.id===producto.id){
+      return{...juego, stock: juego.stock + cantidad};
+    }else{
       return juego;
-    }   
+    }
   });
   return nuevoCatalogo;
 }
 
-//5.- INFORME DE CAJA
-//para contar cuántas unidades se han vendido de un juego en toda la sesión
-function unidadesVendidas(ventas, titulo) {
-  //me quedo solo con las ventas de ese juego
-  const ventasDelJuego = ventas.filter((venta) => venta.titulo === titulo);
-  //sumo las cantidades de esas ventas
-  return ventasDelJuego.reduce((acumulado, venta) => acumulado + venta.cantidad, 0);
+//5. Informe de Caja
+function totalFacturado (ventas){
+  const totalFacturado = ventas.reduce(( acum, venta ) => acum + venta.total ,0); 
+  return totalFacturado;
 }
 
-//para mostrar el informe de caja con el total facturado, el más vendido, el valor del stock y el aviso de stock bajo
-function informeCaja(productos, ventas) {
-  //total facturado: sumo el total de cada venta
-  const totalFacturado = ventas.reduce((acumulado, venta) => acumulado + venta.total, 0);
+//funcion que da las unidades vendidas de un juego
+function unidadesVendidas(ventas, id){
+  const ventasDelJuego= ventas.filter((venta)=>venta.id===id);
+  const cantidadVendida=ventasDelJuego.reduce((acum,venta)=>acum+venta.cantidad,0);
+  return cantidadVendida;
+}
 
-  //producto más vendido: recorro los juegos y me quedo con el que tenga más unidades vendidas
-  const masVendido = productos.reduce((mejor, producto) => {
-    if (unidadesVendidas(ventas, producto.titulo) > unidadesVendidas(ventas, mejor.titulo)) {
-      return producto;
-    } else {
-      return mejor;
+function mostrarRegistro(ventas, inventario){
+  let juegoMasVendido = ventas[0];
+  console.log("El total que se ha facturado es " +totalFacturado(ventas)+ "€");
+  //si no hay ninguna venta sale
+  if (ventas.length===0){
+    console.log("Todavía no hay ventas");
+    return;
+  }else{
+    //recorrer ventas llamando a unidadesVendidas para sacar el juego mas vendido
+    for (const juego of ventas){
+      if (unidadesVendidas(ventas,juegoMasVendido.id)<unidadesVendidas(ventas,juego.id)){
+        juegoMasVendido=juego;
+      }
     }
-  }, productos[0]);
-  const unidadesMasVendido = unidadesVendidas(ventas, masVendido.titulo);
+    console.log("El juego mas vendido es "+juegoMasVendido.nombre)
 
-  //valor del stock restante: precio de venta por stock de cada juego, todo sumado
-  const valorStock = productos.reduce(
-    (acumulado, producto) => acumulado + calcularPrecioPorEstado(producto) * producto.stock,
-    0,
-  );
-
-  //compruebo si queda algún juego con stock bajo
-  const hayStockBajo = productos.some((producto) => tieneStockBajo(producto));
-
-  //muestro el informe
-  console.log("===== INFORME DE CAJA =====");
-  console.log("Total facturado: " + totalFacturado.toFixed(2) + " €");
-
-  //si no se ha vendido nada, no hay producto más vendido
-  if (unidadesMasVendido === 0) {
-    console.log("Producto más vendido: ninguno");
-  } else {
-    console.log("Producto más vendido: " + masVendido.titulo + " (" + unidadesMasVendido + " unidades)");
   }
+  //calcular el valor de mi stock total
+  const valorStock = inventario.reduce((acum, juego) => acum + calcularPrecioPorEstado(juego) * juego.stock, 0);
+  console.log("El valor del stock restante es " + valorStock.toFixed(2) + " €");
 
-  console.log("Valor del stock restante: " + valorStock.toFixed(2) + " €");
+  //mostrar los productos que tienen stock bajo
+  console.log("Productos con stock bajo:");
+  mostrarStockBajo(inventario);
 
-  if (hayStockBajo) {
-    console.log("⚠️ Hay productos con stock bajo");
-  }
 }
-//exportaciones al main para hacer pruebas
-export { mostrarCatalogo, mostrarPorCategoria, mostrarStockBajo, buscarProducto, actualizarStock, reponerStock, registrarVenta, informeCaja };
+export { ventas, mostrarCatalogo, mostrarPorCategoria, mostrarStockBajo, buscarProducto, registrarVenta, actualizarStock, reponerStock, mostrarRegistro };

@@ -56,10 +56,6 @@ document.querySelector('#app').innerHTML = `
 <div class="ticks"></div>
 <section id="spacer"></section>
 `
-
-import {
-  iniciarMenu,
-} from "./menu.js";
+import { iniciarMenu } from "./menu.js";
 
 iniciarMenu();
-

@@ -12,6 +12,8 @@ function calcularPrecioPorEstado (producto) {
       nuevoPrecio = producto.precioBase - producto.precioBase *0.15;
   } else if (producto.estado==="solo-cartucho"){
       nuevoPrecio = producto.precioBase - producto.precioBase *0.3;
+  } else if (producto.estado==="coleccionista"){
+      nuevoPrecio = producto.precioBase + producto.precioBase*0.6;
   }
   return nuevoPrecio;
 }
@@ -36,7 +38,7 @@ function tieneStockBajo(producto) {
 //ver todo el catalogo
 function mostrarCatalogo(productos) {
   const linea=productos.map(
-    (producto) => producto.id +".- " + producto.titulo + " (" + producto.plataforma + ") - Stock: " + producto.stock
+    (producto) => producto.id +".- " + producto.titulo +" " +producto.estado +" (" + producto.plataforma + ") - Stock: " + producto.stock
   );
   console.log(linea.join("\n"));
 }
@@ -90,6 +92,7 @@ function registrarVenta(producto, cantidad){
   } else{
     precioFinal= Math.round(descuentoPorVolumen(producto,cantidad)*cantidad*100)/100;  
   }
+  console.log("El precio por unidad es de : "+producto.precioBase +" y con la subida o bajada por estado es de: " +calcularPrecioPorEstado(producto));
   console.log("El precio de la venta es de: " +precioFinal + "€");
   //guardamos la venta en un array nuevo
   ventas = [...ventas, {id: producto.id, nombre: producto.titulo, cantidad: cantidad, total: precioFinal}];
@@ -160,4 +163,19 @@ function mostrarRegistro(ventas, inventario){
   mostrarStockBajo(inventario);
 
 }
-export { ventas, mostrarCatalogo, mostrarPorCategoria, mostrarStockBajo, buscarProducto, registrarVenta, actualizarStock, reponerStock, mostrarRegistro };
+
+function cambiarEstadoColeccionista(catalogo, id){
+  catalogo[id-1].estado="coleccionista";
+}
+
+
+
+
+
+export { ventas, mostrarCatalogo, mostrarPorCategoria, mostrarStockBajo, buscarProducto, registrarVenta, actualizarStock, reponerStock, mostrarRegistro,cambiarEstadoColeccionista };
+
+
+
+
+
+//un estado nuevo, coleccionista que sube un 60% el precio y hacer que un producto lo use, comprueba el precio vendiendolo 

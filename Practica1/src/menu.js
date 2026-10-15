@@ -9,6 +9,7 @@ import {
   actualizarStock,
   reponerStock,
   mostrarRegistro,
+  cambiarEstadoColeccionista,
 } from "./funciones.js";
 
 //funcion que arranca el menu de la tienda
@@ -19,7 +20,7 @@ function iniciarMenu() {
 
   do {
     opcion = prompt(
-      "RETROSTOCK\n1.- Ver catálogo\n2.- Buscar producto\n3.- Registrar una venta\n4.- Reponer stock\n5.- Informe de caja\n6.- Salir\n7.- Añadir producto",
+      "RETROSTOCK\n1.- Ver catálogo\n2.- Buscar producto\n3.- Registrar una venta\n4.- Reponer stock\n5.- Informe de caja\n6.- Salir\n7.- Añadir producto\n8.-Cambiar Estado",
     );
 
     switch (opcion) {
@@ -115,6 +116,14 @@ function iniciarMenu() {
         console.log("Producto añadido con id " + nuevoProducto.id);
         break;
       }
+
+      case "8":{
+        const productoSeleccionado = Number(prompt("Introduce el id del juego para ponerlo en estado coleccionista: "))
+        cambiarEstadoColeccionista(inventario,productoSeleccionado);
+        console.log("Se ha cambiado su estado a coleccionista");
+        break;
+      }
+
 
       //si pulsa cancelar se sale del menu
       case null:

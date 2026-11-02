@@ -37,17 +37,40 @@ new Punto(3,4).distanciaAlOrigen();
 //     (y en ese caso no cambia nada). El constructor también tiene que pasar por el setter.
 //   - un getter esLargo: true a partir de 400 páginas.
 //   - resumen() → "Momo (Ende), 300 págs."
+
 // ✍️ 2 · Y en la misma clase, lo que es de la CLASE y no de cada libro (static):
 //   - Libro.creados: cuántos libros se han creado (un contador privado y static, con un getter static).
 //   - Libro.desde({ titulo, autor, paginas }) → un Libro nuevo a partir de un objeto.
 export class Libro {
-  constructor(titulo, autor, paginas) {
-    throw new Error("Sin hacer");
+    #paginas;
+    static #creados=0;
+    static get creados(){return Libro.#creados;}
+    static desde(info){return new Libro(info.titulo,info.autor,info.paginas);}
+  constructor(titulo,autor,paginas){
+    if(typeof titulo!=="string"||titulo.trim()==="")throw new Error ("El título es obligatorio.");
+    this.titulo=titulo.trim();
+    this.autor=autor;
+    this.paginas=paginas;
+    Libro.#creados++;
+  
+  }
+  
+  get paginas(){return this.#paginas;}
+  set paginas(num){
+    if(num<=0||!Number.isInteger(num)) throw new Error ("El número de páginas no es válido.");
+    this.#paginas=num;
+  }
+  get esLargo(){
+    return this.#paginas>=400;
+  }
+  resumen(){
+    return `${this.titulo} (${this.autor}), ${this.paginas} págs.`
   }
 }
 
 // ✍️ 3 · Devuelve una FUNCIÓN que, al llamarla suelta (avisar()), devuelva libro.resumen().
 //        Si devuelves libro.resumen tal cual, se pierde this. ¿Cómo lo evitas? (apartado 7.7)
 export function crearAvisador(libro) {
-  throw new Error("Sin hacer");
+  return() => libro.resumen();
 }
+

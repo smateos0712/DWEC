@@ -23,7 +23,11 @@ export class Publicacion {
 export class Libro extends Publicacion {
   constructor(titulo, anio, autor) {
     super(titulo, anio);
-    throw new Error("Sin hacer");
+    this.autor=autor;
+    
+  }
+  descripcion(){
+    return `${super.descripcion()} · ${this.autor}`
   }
 }
 
@@ -32,17 +36,24 @@ export class Libro extends Publicacion {
 export class Revista extends Publicacion {
   constructor(titulo, anio, numero) {
     super(titulo, anio);
-    throw new Error("Sin hacer");
+    this.numero=numero;
+  }
+  descripcion(){
+    return `${super.descripcion()} · nº ${this.numero}`
+  }
+  diasPrestamo() {
+    return 7;
   }
 }
 
 // ✍️ 3 · La descripción de cada publicación de la lista. Sin preguntar de qué tipo es cada una:
 //        cada objeto ya sabe describirse (eso es el polimorfismo).
 export function catalogo(publicaciones) {
-  throw new Error("Sin hacer");
+  return publicaciones.map((p)=>p.descripcion());
 }
 
 // ✍️ 4 · La suma de los días de préstamo de todas.   [libro, revista, revista] → 14 + 7 + 7 = 28
 export function diasTotales(publicaciones) {
-  throw new Error("Sin hacer");
+  const lista = publicaciones.map((p)=> p.diasPrestamo());
+  return lista.reduce((acc,n)=> acc +n,0);
 }

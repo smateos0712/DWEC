@@ -16,7 +16,7 @@ export class PrestamoError extends Error {
 // 🪜 1 · La fecha con formato español: formatoFecha(new Date(2026, 10, 3)) → "03/11/2026"
 //        (pista: Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }))
 export function formatoFecha(fecha) {
-  throw new Error("Sin hacer");
+  return Intl.DateTimeFormat("es-ES",{ day: "2-digit", month: "2-digit", year: "numeric" }).format(fecha);
 }
 
 // ✍️ TU TURNO ─────────────────────────────────────────────────────────────────
@@ -24,7 +24,9 @@ export function formatoFecha(fecha) {
 //        - No cambies `desde` (trabaja sobre una copia).
 //        - Suma días con setDate, no milisegundos: el 25/10 cambia la hora y ese día dura 25 h.
 export function fechaDevolucion(desde, dias) {
-  throw new Error("Sin hacer");
+  const nuevaFecha = new Date(desde);
+  nuevaFecha.setDate(desde.getDate()+dias);
+  return nuevaFecha;
 }
 
 // ✍️ 2 · Un Socio TIENE préstamos (composición): guárdalos en un Map PRIVADO isbn → fecha de devolución.
@@ -36,7 +38,31 @@ export function fechaDevolucion(desde, dias) {
 //   - vencidos(hoy) → los isbn cuya fecha de devolución es ANTERIOR al día de hoy. Cuenta por días: lo que vence
 //     hoy aún no está vencido, sea la hora que sea.
 export class Socio {
+  #prestamos= new Map();
   constructor(nombre, maximo = 3) {
-    throw new Error("Sin hacer");
+    this.nombre=nombre;
+    this.maximo=maximo;
+  }
+  get numPrestamos(){
+    return this.#prestamos.size;
+  }
+  prestar(isbn,hoy,dias=14){
+    if(this.#prestamos.has(isbn)) throw new PrestamoError(`${this.nombre} ya tiene este título`);
+    if (this.numPrestamos >=this.maximo) throw new PrestamoError(`${this.nombre} no puede tener más préstamos.`);
+    this.#prestamos.set(isbn, fechaDevolucion(hoy, dias));
+    
+  }
+
+  devolver(isbn){
+    if (!this.#prestamos.has(isbn)) throw new PrestamoError(`${this.nombre} no tiene este título.`);
+    this.#prestamos.delete(isbn);
+  }
+
+  vencidos(hoy){
+    const dia = new Date(hoy.getFullYear(),hoy.getMonth(), hoy.getDate());
+    let vencidos = [...this.#prestamos].filter(([,fecha]) => fecha<dia).map(([isbn])=> isbn);
+
+    return vencidos;
   }
 }
+

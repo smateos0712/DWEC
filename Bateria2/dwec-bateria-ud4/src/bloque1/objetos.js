@@ -1,6 +1,6 @@
 // Bloque 1 · Objetos literales, this, referencias y copias
 // Explicación: web de DWEC → UD4 · 4.1 Batería de ejercicios → Bloque 1 (y los apartados 2–5 de la UD4).
-// Comprueba con:  ./bateria.sh comprobar 1
+// Comprueba con:  docker compose run --rm web npm run comprobar 1
 
 // 👀 EJEMPLO RESUELTO ─────────────────────────────────────────────────────────
 // Un libro como objeto literal. El método resumen() usa this: «el objeto con el que se llama».
@@ -42,7 +42,12 @@ export function marcarPrestado(libro) {
 // ✍️ 2 · Cuenta cuántos libros hay de cada autor.
 //        contarPorAutor([{ autor: "Ende" }, { autor: "Tolkien" }, { autor: "Ende" }]) → { Ende: 2, Tolkien: 1 }
 export function contarPorAutor(libros) {
-  
+const contador={}
+  for (const libro of libros){
+    const autor=libro.autor;
+    contador[autor]= autor in contador?contador[autor]+1:1;
+  }
+  return (contador)
   throw new Error("Sin hacer");
 }
 
@@ -50,6 +55,8 @@ export function contarPorAutor(libros) {
 //        socio = { nombre: "Ana", direccion: { ciudad: "Cádiz" }, prestamos: ["111"] }
 //        Cuidado: { ...socio } no basta. ¿Por qué? (predicción p3)
 export function copiaProfunda(socio) {
+  const copia = {...socio, direccion: {...socio.direccion}, prestamos: {...socio.prestamos}};
+  return copia  
   throw new Error("Sin hacer");
 }
 
@@ -57,5 +64,6 @@ export function copiaProfunda(socio) {
 //        ficha(crearLibro("Momo", "Ende", 300)) → "titulo: Momo · autor: Ende · paginas: 300 · prestado: false"
 //        (pista: Object.entries + filter + map + join)
 export function ficha(libro) {
+  return Object.entries(libro).filter(([,v]) => typeof v !== "function").map(([k,v])=>`${k}: ${v}`).join(" · ");  
   throw new Error("Sin hacer");
 }

@@ -11,22 +11,31 @@ export class TareaRecurrente extends Tarea{
     // 2 · Llama al constructor del padre (super) con lo que es de Tarea, ANTES de usar this.
     super(titulo,prioridad,limite);
     // 3 · cadaDias tiene que ser un entero ≥ 1 → si no, RangeError.
-    if (Number.isInteger(cadaDias)<1) throw new RangeError("Los días introducidos no son válidos.")
+    if (!Number.isInteger(cadaDias) || cadaDias<1) throw new RangeError("Los días introducidos no son válidos.")
     //     Pista: Number.isInteger
     // 4 · Una recurrente sin límite no tiene sentido → si this.limite es null, TypeError.
     if(!limite) throw new TypeError("No has indicado el límite de la tarea.")
     // 5 · Guarda this.cadaDias.
     this.cadaDias=cadaDias;
-    throw new Error("Sin hacer");
   }
 
   // 6 · siguiente(): devuelve una TareaRecurrente NUEVA con el mismo título, prioridad y cadaDias,
   //     y el límite cadaDias días después. ⚠️ Sin tocar this.limite: copia la fecha primero.
   //     Pista: const limite = new Date(this.limite); limite.setDate(limite.getDate() + …)
+  siguiente(){
+    const limite = new Date(this.limite);
+    limite.setDate(limite.getDate()+this.cadaDias);
+    return new TareaRecurrente(this.titulo,this.prioridad,limite,this.cadaDias);
+  } 
 
   // 7 · Sobrescribe alCompletar(): en vez de [], devuelve [la siguiente].
-
+  alCompletar() {
+    return [this.siguiente()];
+  }
   // 8 · Sobrescribe toString(): lo del padre + " · 🔁 cada N días".
+  toString() {
+    return super.toString()+` · 🔁 cada ${this.cadaDias} días`;
+  }
 }
 
 // Comprueba con:  docker compose run --rm web npm test 2-recurrente

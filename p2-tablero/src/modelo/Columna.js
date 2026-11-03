@@ -10,12 +10,21 @@ export class Columna {
   constructor(nombre, limiteWip = null) {
     // 1 · nombre: texto no vacío (sin espacios a los lados) → si no, TypeError
     if (nombre.trim()==="")throw new TypeError("El nombre no puede estar vacío");
+    this.nombre=nombre;
     //     limiteWip: null (sin límite) o un entero ≥ 1 → si no, RangeError
+    if(limiteWip!==null && (!Number.isInteger(limiteWip)||limiteWip<1)) throw new RangeError("El limite introducido no es válido.")
+    this.limiteWip=limiteWip;
   }
 
   // 2 · get llena: true si hay límite y ya hay tantas tareas como el límite
+  get llena(){
+    return this.limiteWip !== null && this.#tareas.length>= this.limiteWip;
+  }
 
   // 3 · get tareas: una COPIA del array (que nadie pueda tocar el tuyo desde fuera)
+  get tareas(){
+    return [...this.#tareas];
+  }
 
   // 4 · añadir(tarea): TypeError si no es instanceof Tarea · Error («… está llena …») si está
   //     llena · si no, la guarda y la devuelve

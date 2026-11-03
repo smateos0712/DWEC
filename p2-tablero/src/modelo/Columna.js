@@ -4,12 +4,13 @@
 import { Tarea } from "./Tarea.js";
 
 export class Columna {
+  
   // Privado: #tareas, un array
-
+  #tareas=[];
   constructor(nombre, limiteWip = null) {
     // 1 · nombre: texto no vacío (sin espacios a los lados) → si no, TypeError
+    if (nombre.trim()==="")throw new TypeError("El nombre no puede estar vacío");
     //     limiteWip: null (sin límite) o un entero ≥ 1 → si no, RangeError
-    throw new Error("Sin hacer");
   }
 
   // 2 · get llena: true si hay límite y ya hay tantas tareas como el límite

@@ -29,8 +29,20 @@ export class Columna {
   // 4 · añadir(tarea): TypeError si no es instanceof Tarea · Error («… está llena …») si está
   //     llena · si no, la guarda y la devuelve
 
+  añadir(tarea){
+    if(!(tarea instanceof Tarea)) throw new TypeError (`${tarea} no es una tarea.`);
+    if (this.llena) throw new Error("La columna está llena");
+    this.#tareas.push(tarea);
+    return tarea;
+  }
+
   // 5 · quitar(id): la saca del array y la devuelve · Error («… no está …») si no la encuentra
   //     Pista: findIndex + splice
+  quitar(id){
+    const posicion = this.#tareas.findIndex((tarea)=> tarea.id === id);
+    if (posicion <0) throw new Error(`La tarea con id: ${id} no está en la lista.`);
+    return this.#tareas.splice(posicion,1)[0];
+  }
   // 6 · tiene(id): true / false. Pista: some
 
   // 7 · ordenadas(): un array NUEVO ordenado: primero prioridad alta (usa t.peso), y a igual

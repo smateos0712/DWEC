@@ -10,7 +10,7 @@ export class Columna {
   constructor(nombre, limiteWip = null) {
     // 1 · nombre: texto no vacío (sin espacios a los lados) → si no, TypeError
     if (nombre.trim()==="")throw new TypeError("El nombre no puede estar vacío");
-    this.nombre=nombre;
+    this.nombre=nombre.trim();
     //     limiteWip: null (sin límite) o un entero ≥ 1 → si no, RangeError
     if(limiteWip!==null && (!Number.isInteger(limiteWip)||limiteWip<1)) throw new RangeError("El limite introducido no es válido.")
     this.limiteWip=limiteWip;
@@ -44,10 +44,34 @@ export class Columna {
     return this.#tareas.splice(posicion,1)[0];
   }
   // 6 · tiene(id): true / false. Pista: some
+  tiene(id){
+    return this.#tareas.some((tarea)=> tarea.id===id);
+  }
 
   // 7 · ordenadas(): un array NUEVO ordenado: primero prioridad alta (usa t.peso), y a igual
   //     prioridad, el límite más cercano; las que no tienen límite, al final.
   //     Pista: [...this.#tareas].sort((a, b) => …) — ¿por qué la copia?
+  ordenadas(){
+    const nuevoArray = [...this.#tareas].sort((a,b)=>{
+      if(a.peso===b.peso){
+        if (a.limite===null){
+          return b.limite-a.limite;
+        }
+        if(b.limite===null){
+          return b.limite-a.limite;
+        }
+        return a.limite-b.limite;
+      }
+      else{
+        return b.peso-a.peso;
+      }
+    });
+    return nuevoArray;
+  }
+
+
+
+
 }
 
 // Comprueba con:  docker compose run --rm web npm test 3-columna

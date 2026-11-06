@@ -16,8 +16,8 @@ export class Tablero {
   constructor(limiteEnCurso = 3) {
     // Crea las tres columnas; solo «En curso» lleva límite WIP (limiteEnCurso)
     this.#columnas.set("Por hacer", new Columna("Por hacer"));
-    this.#columnas.set("En curso", new Columna("En curso"));
-    this.#columnas.set("Hecho",new Columna("Hecho",limiteEnCurso));
+    this.#columnas.set("En curso", new Columna("En curso",limiteEnCurso));
+    this.#columnas.set("Hecho",new Columna("Hecho"));
   }
 
   // static desde(datos, limiteEnCurso): un Tablero con una tarea por cada objeto de datos
@@ -57,7 +57,9 @@ export class Tablero {
 
   // buscar(id): la tarea, esté en la columna que esté, o null
   buscar(id){
-
+    const columnaBuscada = this.dondeEsta(id);
+    if(columnaBuscada===null) return null;
+    return columnaBuscada.tareas.find((tarea)=> tarea.id===id);
   }
 
 
@@ -75,12 +77,35 @@ export class Tablero {
 
   // mover(id, destino): Error si no existe la tarea · Error si la columna destino está llena
   //   (¡comprueba ANTES de quitarla de su columna, o se perdería!) · la mueve y la devuelve
+  mover(id,destino){
+    const columnaOrigen= this.dondeEsta(id);
+    if(columnaOrigen===null)throw new Error (`No existe el id: ${id}`);
+    const columnaDestino= this.columna(destino);
+    if(columnaDestino.llena) throw new Error(`La columna de destino ${columnaDestino.nombre} está llena.`);
+    return columnaDestino.añadir(columnaOrigen.quitar(id));
+  }
 
   // completar(id): la mueve a «Hecho» y añade a «Por hacer» lo que devuelva tarea.alCompletar()
   //   ⚠️ Sin preguntar si es recurrente: eso es el polimorfismo
+  completar(id){
+    const tarea = this.mover(id,"Hecho");
+    for(const t of tarea.alCompletar()){
+      this.columna("Por hacer").añadir(t);
+    }  
+  }
 
   // resumen(hoy = new Date()): { porHacer, enCurso, hecho, vencidas }
   //   vencidas = las que estaVencida(hoy) y NO están en «Hecho»
+  resumen(hoy = new Date()){
+    const listaTareas = [...this.columna("Por hacer").tareas, ...this.columna("En curso").tareas];
+    const tareasVencidas = listaTareas.filter((tarea)=>tarea.estaVencida(hoy)).length; 
+    return {
+    "porHacer": this.columna("Por hacer").tareas.length,
+    "enCurso": this.columna("En curso").tareas.length,
+    "hecho": this.columna("Hecho").tareas.length,
+    "vencidas": tareasVencidas
+    }
+  }
 
   // ✍️ A5 · Reglas (vuelves a mover y completar) ─────────────────────────────────
   //   - Columna llena → ColumnaLlenaError (en vez de un Error cualquiera)

@@ -78,17 +78,13 @@ export class Tablero {
   // mover(id, destino): Error si no existe la tarea · Error si la columna destino está llena
   //   (¡comprueba ANTES de quitarla de su columna, o se perdería!) · la mueve y la devuelve
   mover(id,destino){
-    const columnaOrigen= this.dondeEsta(id);
-    if(columnaOrigen===null)throw new Error (`No existe el id: ${id}`);
-    const columnaDestino= this.columna(destino);
-    if(columnaDestino.llena) throw new ColumnaLlenaError(columnaDestino);
-    return columnaDestino.añadir(columnaOrigen.quitar(id));
+    return this.#trasladar(id,destino);
   }
 
   // completar(id): la mueve a «Hecho» y añade a «Por hacer» lo que devuelva tarea.alCompletar()
   //   ⚠️ Sin preguntar si es recurrente: eso es el polimorfismo
   completar(id){
-    const tarea = this.mover(id,"Hecho");
+    const tarea = this.#trasladar(id,"Hecho");
     for(const t of tarea.alCompletar()){
       this.columna("Por hacer").añadir(t);
     }  
@@ -113,6 +109,16 @@ export class Tablero {
   //     MovimientoNoPermitidoError. Todo se comprueba ANTES de tocar nada.
   //   Pista: mover y completar hacen casi lo mismo. Un método privado #trasladar(id, destino)
   //   con las comprobaciones evita escribirlas dos veces.
+  #trasladar(id,destino){
+    const columnaOrigen= this.dondeEsta(id);
+    if(columnaOrigen===null) throw new Error (`No existe el id: ${id}`);
+    if(columnaOrigen.nombre==="Hecho") throw new MovimientoNoPermitidoError(id,columnaOrigen.nombre,destino);
+    if(columnaOrigen.nombre===destino) throw new MovimientoNoPermitidoError(id,columnaOrigen.nombre,destino);
+    if(this.columna(destino).llena) throw new ColumnaLlenaError(this.columna(destino));
+    return this.columna(destino).añadir(columnaOrigen.quitar(id));
+  }
+
+
 
   // ✍️ C4 (bloque C) ────────────────────────────────────────────────────────────
   // toJSON(): { version, limiteEnCurso, columnas: { "Por hacer": [datos…], … } }

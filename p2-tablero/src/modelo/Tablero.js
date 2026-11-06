@@ -81,7 +81,7 @@ export class Tablero {
     const columnaOrigen= this.dondeEsta(id);
     if(columnaOrigen===null)throw new Error (`No existe el id: ${id}`);
     const columnaDestino= this.columna(destino);
-    if(columnaDestino.llena) throw new Error(`La columna de destino ${columnaDestino.nombre} está llena.`);
+    if(columnaDestino.llena) throw new ColumnaLlenaError(columnaDestino);
     return columnaDestino.añadir(columnaOrigen.quitar(id));
   }
 

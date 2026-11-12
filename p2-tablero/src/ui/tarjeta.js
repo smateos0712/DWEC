@@ -28,7 +28,7 @@ export function crearTarjeta(tarea, hoy = new Date()) {
 //   - Sin tareas: deja SOLO un <p class="vacia">Sin tareas</p>
 export function pintarLista(contenedor, tareas, hoy = new Date()) {
   contenedor.replaceChildren();
-    if(tareas.length===0){
+  if(tareas.length===0){
     const vacio = document.createElement("p");
     vacio.className="vacia";
     vacio.textContent= "Sin tareas";

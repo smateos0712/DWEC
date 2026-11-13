@@ -28,8 +28,12 @@ export function mostrarErrores(form, errores) {
   for(const error of pConError){
     if (error.dataset.errorDe in errores){
       error.textContent = errores[error.dataset.errorDe];
-      form.elements["name='titulo'"];
-  }
+      form.elements[error.dataset.errorDe].setAttribute("aria-invalid",true);
+    }
+    else{
+      error.textContent="";
+      form.elements[error.dataset.errorDe].removeAttribute("aria-invalid");
+    }
 
   }
 }

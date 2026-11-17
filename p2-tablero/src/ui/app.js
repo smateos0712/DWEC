@@ -43,7 +43,53 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
   //   - [data-dato="vencidas"]: las vencidas de tablero.resumen(ahora)
   //   La fecha de hoy: const ahora = hoy ?? new Date();  (los tests pasan una fija)
   function pintar() {
-    throw new Error("Sin hacer");
+    const ahora = hoy ?? new Date();
+    const listaColumnas = columnas.querySelectorAll("[data-columna]")
+    const resumenTablero = tablero.resumen(ahora)
+
+    const progreso = raiz.querySelector('[data-dato="progreso"]')
+    if (progreso){
+      const total = resumenTablero.porHacer + resumenTablero.enCurso + resumenTablero.hecho;
+      const hechas = resumenTablero.hecho;
+      const porcentaje = total === 0 ? 0 : Math.round((hechas / total) * 100);
+      progreso.textContent = `${porcentaje} %`
+
+    }
+
+    const vencidas = raiz.querySelector('[data-dato="vencidas"]')
+    if (vencidas){
+      const nvencidas = resumenTablero.vencidas
+      vencidas.textContent = `${nvencidas}`
+    }
+
+    //Recorremos las columnas de la lista de columnas del html                                                  
+    for (const col of listaColumnas){
+      const nombreCol = col.dataset.columna;
+      const colLista = col.querySelector(".lista")
+      const colObjeto = tablero.columna(nombreCol)
+      const tareasOrdenadas = colObjeto.ordenadas()
+      pintarLista(colLista,tareasOrdenadas,ahora)
+
+      //contadores en columna si tiene limite y si no
+      const colContador= col.querySelector(".contador")
+      if (colObjeto.limiteWip !== null){
+        colContador.textContent=`(${tareasOrdenadas.length}/${colObjeto.limiteWip})`
+      } else{
+        colContador.textContent=`(${tareasOrdenadas.length})`
+      }
+      
+      const listaTarjetas = colLista.querySelectorAll(".tarjeta")
+      const accionesPermitidas = ACCIONES[nombreCol] || [];
+      for (const tarjeta of listaTarjetas){
+        for (const [texto, accion] of accionesPermitidas){
+          const boton = document.createElement("button")
+          boton.textContent = texto
+          boton.dataset.accion = accion
+          boton.type="button";
+          tarjeta.append(boton)
+        }
+      }
+    }
   }
 
   // 👀 Resuelto: avisar("texto") enseña el aviso; avisar("") lo esconde

@@ -21,7 +21,18 @@ const ACCIONES = {
 //   - cadaDias (si viene): entero mayor que 0. Si es correcto pero no hay limite, el error va
 //     en «limite»: una tarea que se repite necesita fecha límite
 export function validar(datos) {
-  throw new Error("Sin hacer");
+  const errores = {}
+  if (datos.titulo.length===0||datos.titulo.length>80){
+    errores.titulo= "Escribe un título de 1 a 80 caracteres."
+  }
+  if("cadaDias" in datos && (!Number.isInteger(datos.cadaDias) || datos.cadaDias<=0)){
+    errores.cadaDias = "Escribe una franja de días entera mayor a 0."
+  }
+  if(datos.limite===null){
+    errores.limite= "una tarea que se repite necesita fecha límite."
+  }
+  return errores
+
 }
 
 /**

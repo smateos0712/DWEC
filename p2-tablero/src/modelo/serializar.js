@@ -27,5 +27,20 @@ export function aDatos(tarea) {
 // ✍️ C1 · desdeDatos(datos) → lo contrario de aDatos: TareaRecurrente si trae cadaDias, Tarea si no
 //   (cada campo a su sitio en el constructor, también el id)
 export function desdeDatos(datos) {
-  throw new Error("Sin hacer");
+  
+  let prioridad = "media"
+  let limite= null
+  if (datos.prioridad){
+    prioridad = datos.prioridad
+  }
+  if (datos.limite ){
+    limite = datos.limite
+  }
+  
+  
+  if (datos.cadaDias){
+    return new TareaRecurrente(datos.titulo,prioridad,limite,datos.cadaDias,datos.id)
+  } else {
+    return new Tarea(datos.titulo,prioridad,limite,datos.id)
+  }
 }

@@ -36,8 +36,6 @@ export function desdeDatos(datos) {
   if (datos.limite ){
     limite = datos.limite
   }
-  
-  
   if (datos.cadaDias){
     return new TareaRecurrente(datos.titulo,prioridad,limite,datos.cadaDias,datos.id)
   } else {

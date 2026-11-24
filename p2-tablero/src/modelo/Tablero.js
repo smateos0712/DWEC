@@ -150,9 +150,17 @@ export class Tablero {
     if (datos===null || datos.version !== Tablero.VERSION_DATOS){
       throw new Error("La versión de los datos no es la misma que la del tablero.")
     }
-    const tablero=new Tablero(datos.limiteEnCurso,);
 
+    const tablero = new Tablero(datos.limiteEnCurso);
 
+    for (const nombre in datos.columnas){
+      for (const dato of datos.columnas[nombre]){
+        const tarea = desdeDatos(dato);
+        tablero.columna(nombre).añadir(tarea);
+      }
+    }
+    
+    return tablero;
   
   }
 }

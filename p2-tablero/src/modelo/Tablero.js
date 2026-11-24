@@ -123,10 +123,37 @@ export class Tablero {
   // ✍️ C4 (bloque C) ────────────────────────────────────────────────────────────
   // toJSON(): { version, limiteEnCurso, columnas: { "Por hacer": [datos…], … } }
   //   JSON.stringify(tablero) lo llama solo. Sin él sale "{}": los # no se ven. Usa aDatos.
+  toJSON(){
+    const tareasDeColumna = (nombre) =>{
+      const lista_tareas = [];
+      for (const tarea of this.columna(nombre).tareas){
+        lista_tareas.push(aDatos(tarea))
+      }
+      return lista_tareas;
+    }
+    return {"version": Tablero.VERSION_DATOS,
+           "limiteEnCurso": this.columna("En curso").limiteWip,
+           "columnas": {
+            "Por hacer": tareasDeColumna("Por hacer"),
+            "En curso": tareasDeColumna("En curso"),
+            "Hecho": tareasDeColumna("Hecho")
+           }
+          }
+  }
+
+
+
+
 
   /** Lo contrario de toJSON: el MISMO tablero (columnas, ids y límite WIP). Lanza si no encaja. */
   static desdeJSON(datos) {
-    throw new Error("Sin hacer");
+    if (datos===null || datos.version !== Tablero.VERSION_DATOS){
+      throw new Error("La versión de los datos no es la misma que la del tablero.")
+    }
+    const tablero=new Tablero(datos.limiteEnCurso,);
+
+
+  
   }
 }
 

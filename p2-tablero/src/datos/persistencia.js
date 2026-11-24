@@ -20,7 +20,24 @@ export async function arrancar({
   url = "/tareas-iniciales.json",
   limiteEnCurso = 3,
 } = {}) {
-  throw new Error("Sin hacer");
+  const guardado = cargar(CLAVE,null,storage)
+  if (guardado !== null){
+    try{
+      const tableroDevuelto = {"tablero": Tablero.desdeJSON(guardado), "origen": "guardado"};
+      return tableroDevuelto;
+    } catch (e){
+      borrar(CLAVE,storage);
+      console.warn(e.message);
+    }
+  }
+  try{
+    const datos = await obtenerJSON(url, fetchFn);
+    const tableroDevuelto = {"tablero": Tablero.desde(datos,limiteEnCurso),"origen":"inicial"};
+    return tableroDevuelto;
+  }catch(e){
+    return {"tablero": new Tablero(limiteEnCurso), "origen":"vacio", "error": e.message};
+  }
+
 }
 
 (void Tablero, borrar, cargar, guardar, obtenerJSON); // (borra esta línea cuando los uses)

@@ -28,11 +28,10 @@ export function validar(datos) {
   if("cadaDias" in datos && (!Number.isInteger(datos.cadaDias) || datos.cadaDias<=0)){
     errores.cadaDias = "Escribe una franja de días entera mayor a 0."
   }
-  if(datos.limite===null){
+  if(datos.limite===null && (datos.cadaDias && !("cadaDias" in errores))){
     errores.limite= "una tarea que se repite necesita fecha límite."
   }
   return errores
-
 }
 
 /**
@@ -145,6 +144,9 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
       if (error instanceof ErrorTablero){
         avisar(error.message);
       }
+      else{
+        throw error;
+      }
     }
 
   })
@@ -153,6 +155,32 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
   // ✍️ B6 · submit de `form`: preventDefault, leerFormulario, validar y mostrarErrores. Si hay errores,
   //   no se crea nada. Si no, tablero.crearTarea(datos) (como un cambio más) y form.reset().
 
+  form.addEventListener("submit",(evento)=>{
+    
+    try{
+      evento.preventDefault();
+      const datos = leerFormulario(form);
+      const errores = validar(datos);
+      mostrarErrores(form,errores);
+
+      if (Object.keys(errores).length===0){
+        tablero.crearTarea(datos);
+        alCambiar(tablero);
+        avisar("");
+        pintar();
+        form.reset()
+      }
+    }
+
+    catch (error){
+      if (error instanceof ErrorTablero){
+        avisar(error.message)
+      }
+      else{
+        throw error;
+      }      
+    }
+  })
   pintar();
   return { pintar };
 }

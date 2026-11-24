@@ -24,16 +24,14 @@ export function leerFormulario(form) {
 //   - Si no lo tiene: <p> vacío y SIN aria-invalid (removeAttribute)
 //   Pista: p.dataset.errorDe es el nombre del campo (data-error-de → dataset.errorDe)
 export function mostrarErrores(form, errores) {
-  const pConError =  form.querySelectorAll("[data-error-de]");
-  for(const error of pConError){
-    if (error.dataset.errorDe in errores){
+  const pConError = form.querySelectorAll("[data-error-de]");
+  for (const error of pConError) {
+    if (error.dataset.errorDe in errores) {
       error.textContent = errores[error.dataset.errorDe];
-      form.elements[error.dataset.errorDe].setAttribute("aria-invalid",true);
-    }
-    else{
-      error.textContent="";
+      form.elements[error.dataset.errorDe].setAttribute("aria-invalid", true);
+    } else {
+      error.textContent = "";
       form.elements[error.dataset.errorDe].removeAttribute("aria-invalid");
     }
-
   }
 }

@@ -6,19 +6,17 @@
 //     del contenedor (contenedor.contains(...)), llama a manejador(elemento, evento)
 //   - Devuelve una función que quita el listener (removeEventListener con la MISMA función)
 export function delegar(contenedor, tipo, selector, manejador) {
-  
-  function alPulsar(evento){
+  function alPulsar(evento) {
     const pulsado = evento.target.closest(selector);
-    if (pulsado !== null&&contenedor.contains(pulsado)){
-      return manejador(pulsado,evento);
+    if (pulsado !== null && contenedor.contains(pulsado)) {
+      return manejador(pulsado, evento);
     }
   }
-  
+
   contenedor.addEventListener(tipo, alPulsar);
 
-  function removeEventListener(){
-    return contenedor.removeEventListener(tipo,alPulsar);
+  function removeEventListener() {
+    return contenedor.removeEventListener(tipo, alPulsar);
   }
   return removeEventListener;
-
 }

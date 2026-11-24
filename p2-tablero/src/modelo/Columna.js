@@ -4,33 +4,33 @@
 import { Tarea } from "./Tarea.js";
 
 export class Columna {
-  
   // Privado: #tareas, un array
-  #tareas=[];
+  #tareas = [];
   constructor(nombre, limiteWip = null) {
     // 1 · nombre: texto no vacío (sin espacios a los lados) → si no, TypeError
-    if (nombre.trim()==="")throw new TypeError("El nombre no puede estar vacío");
-    this.nombre=nombre.trim();
+    if (nombre.trim() === "") throw new TypeError("El nombre no puede estar vacío");
+    this.nombre = nombre.trim();
     //     limiteWip: null (sin límite) o un entero ≥ 1 → si no, RangeError
-    if(limiteWip!==null && (!Number.isInteger(limiteWip)||limiteWip<1)) throw new RangeError("El limite introducido no es válido.")
-    this.limiteWip=limiteWip;
+    if (limiteWip !== null && (!Number.isInteger(limiteWip) || limiteWip < 1))
+      throw new RangeError("El limite introducido no es válido.");
+    this.limiteWip = limiteWip;
   }
 
   // 2 · get llena: true si hay límite y ya hay tantas tareas como el límite
-  get llena(){
-    return this.limiteWip !== null && this.#tareas.length>= this.limiteWip;
+  get llena() {
+    return this.limiteWip !== null && this.#tareas.length >= this.limiteWip;
   }
 
   // 3 · get tareas: una COPIA del array (que nadie pueda tocar el tuyo desde fuera)
-  get tareas(){
+  get tareas() {
     return [...this.#tareas];
   }
 
   // 4 · añadir(tarea): TypeError si no es instanceof Tarea · Error («… está llena …») si está
   //     llena · si no, la guarda y la devuelve
 
-  añadir(tarea){
-    if(!(tarea instanceof Tarea)) throw new TypeError (`${tarea} no es una tarea.`);
+  añadir(tarea) {
+    if (!(tarea instanceof Tarea)) throw new TypeError(`${tarea} no es una tarea.`);
     if (this.llena) throw new Error("La columna está llena");
     this.#tareas.push(tarea);
     return tarea;
@@ -38,40 +38,35 @@ export class Columna {
 
   // 5 · quitar(id): la saca del array y la devuelve · Error («… no está …») si no la encuentra
   //     Pista: findIndex + splice
-  quitar(id){
-    const posicion = this.#tareas.findIndex((tarea)=> tarea.id === id);
-    if (posicion <0) throw new Error(`La tarea con id: ${id} no está en la lista.`);
-    return this.#tareas.splice(posicion,1)[0];
+  quitar(id) {
+    const posicion = this.#tareas.findIndex((tarea) => tarea.id === id);
+    if (posicion < 0) throw new Error(`La tarea con id: ${id} no está en la lista.`);
+    return this.#tareas.splice(posicion, 1)[0];
   }
   // 6 · tiene(id): true / false. Pista: some
-  tiene(id){
-    return this.#tareas.some((tarea)=> tarea.id===id);
+  tiene(id) {
+    return this.#tareas.some((tarea) => tarea.id === id);
   }
 
   // 7 · ordenadas(): un array NUEVO ordenado: primero prioridad alta (usa t.peso), y a igual
   //     prioridad, el límite más cercano; las que no tienen límite, al final.
   //     Pista: [...this.#tareas].sort((a, b) => …) — ¿por qué la copia?
-  ordenadas(){
-    const nuevoArray = [...this.#tareas].sort((a,b)=>{
-      if(a.peso===b.peso){
-        if (a.limite===null){
-          return b.limite-a.limite;
+  ordenadas() {
+    const nuevoArray = [...this.#tareas].sort((a, b) => {
+      if (a.peso === b.peso) {
+        if (a.limite === null) {
+          return b.limite - a.limite;
         }
-        if(b.limite===null){
-          return b.limite-a.limite;
+        if (b.limite === null) {
+          return b.limite - a.limite;
         }
-        return a.limite-b.limite;
-      }
-      else{
-        return b.peso-a.peso;
+        return a.limite - b.limite;
+      } else {
+        return b.peso - a.peso;
       }
     });
     return nuevoArray;
   }
-
-
-
-
 }
 
 // Comprueba con:  docker compose run --rm web npm test 3-columna

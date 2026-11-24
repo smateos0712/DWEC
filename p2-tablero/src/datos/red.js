@@ -1,7 +1,5 @@
 // red.js — Bloque C · ✍️ C2. Pedir un JSON con fetch y async/await, sin fiarse de nada.
 
-import { fechaATexto } from "../modelo/serializar";
-
 // ✍️ C2 · async obtenerJSON(url, fetchFn = fetch) → el JSON ya convertido
 //   - const respuesta = await fetchFn(url)
 //   - Si !respuesta.ok → lanza un Error con el código (respuesta.status) Y la url en el mensaje
@@ -11,12 +9,11 @@ import { fechaATexto } from "../modelo/serializar";
 //   - Los errores de red (sin conexión) NO se capturan aquí: que le lleguen a quien llama
 export async function obtenerJSON(url, fetchFn = fetch) {
   const respuesta = await fetchFn(url);
-  if (!respuesta.ok){
+  if (!respuesta.ok) {
     throw new Error(`${respuesta.status} - ${url}`);
   }
-  if (!respuesta.headers.get("Content-Type").includes("application/json")){
+  if (!respuesta.headers.get("Content-Type").includes("application/json")) {
     throw new Error(`La respuesta obtenida de ${url} no es un JSON.`);
   }
-  return respuesta.json() 
-
+  return respuesta.json();
 }

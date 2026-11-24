@@ -8,7 +8,7 @@ export const CLAVE = "dwec-p2-tablero";
 
 // ✍️ C5 · guardarTablero(tablero, storage = localStorage): guarda el tablero en CLAVE
 export function guardarTablero(tablero, storage = localStorage) {
-  guardar(CLAVE,tablero,storage);
+  guardar(CLAVE, tablero, storage);
 }
 
 // ✍️ C6 · async arrancar({ storage = localStorage, fetchFn = fetch, url = "/tareas-iniciales.json",
@@ -20,24 +20,20 @@ export async function arrancar({
   url = "/tareas-iniciales.json",
   limiteEnCurso = 3,
 } = {}) {
-  const guardado = cargar(CLAVE,null,storage)
-  if (guardado !== null){
-    try{
-      const tableroDevuelto = {"tablero": Tablero.desdeJSON(guardado), "origen": "guardado"};
+  const guardado = cargar(CLAVE, null, storage);
+  if (guardado !== null) {
+    try {
+      const tableroDevuelto = { tablero: Tablero.desdeJSON(guardado), origen: "guardado" };
       return tableroDevuelto;
-    } catch (e){
-      borrar(CLAVE,storage);
-      console.warn(e.message);
+    } catch {
+      borrar(CLAVE, storage);
     }
   }
-  try{
+  try {
     const datos = await obtenerJSON(url, fetchFn);
-    const tableroDevuelto = {"tablero": Tablero.desde(datos,limiteEnCurso),"origen":"inicial"};
+    const tableroDevuelto = { tablero: Tablero.desde(datos, limiteEnCurso), origen: "inicial" };
     return tableroDevuelto;
-  }catch(e){
-    return {"tablero": new Tablero(limiteEnCurso), "origen":"vacio", "error": e.message};
+  } catch (e) {
+    return { tablero: new Tablero(limiteEnCurso), origen: "vacio", error: e.message };
   }
-
 }
-
-(void Tablero, borrar, cargar, guardar, obtenerJSON); // (borra esta línea cuando los uses)

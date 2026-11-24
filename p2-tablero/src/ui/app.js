@@ -21,17 +21,17 @@ const ACCIONES = {
 //   - cadaDias (si viene): entero mayor que 0. Si es correcto pero no hay limite, el error va
 //     en «limite»: una tarea que se repite necesita fecha límite
 export function validar(datos) {
-  const errores = {}
-  if (datos.titulo.length===0||datos.titulo.length>80){
-    errores.titulo= "Escribe un título de 1 a 80 caracteres."
+  const errores = {};
+  if (datos.titulo.length === 0 || datos.titulo.length > 80) {
+    errores.titulo = "Escribe un título de 1 a 80 caracteres.";
   }
-  if("cadaDias" in datos && (!Number.isInteger(datos.cadaDias) || datos.cadaDias<=0)){
-    errores.cadaDias = "Escribe una franja de días entera mayor a 0."
+  if ("cadaDias" in datos && (!Number.isInteger(datos.cadaDias) || datos.cadaDias <= 0)) {
+    errores.cadaDias = "Escribe una franja de días entera mayor a 0.";
   }
-  if(datos.limite===null && (datos.cadaDias && !("cadaDias" in errores))){
-    errores.limite= "una tarea que se repite necesita fecha límite."
+  if (datos.limite === null && datos.cadaDias && !("cadaDias" in errores)) {
+    errores.limite = "una tarea que se repite necesita fecha límite.";
   }
-  return errores
+  return errores;
 }
 
 /**
@@ -43,8 +43,6 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
   const form = raiz.querySelector("#form-alta");
   const aviso = raiz.querySelector("#aviso");
   const columnas = raiz.querySelector("#columnas");
-  const resumen = raiz.querySelector("#resumen");
-
   // ✍️ B4 · pintar(): deja la página igual que el modelo cada vez que se llama, y NO pone listeners
   //   - cada columna ([data-columna="…"]): sus tareas en el orden de ordenadas(), con pintarLista en su
   //     .lista, y en cada .tarjeta sus botones según ACCIONES: <button type="button" data-accion="…">
@@ -54,49 +52,48 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
   //   La fecha de hoy: const ahora = hoy ?? new Date();  (los tests pasan una fija)
   function pintar() {
     const ahora = hoy ?? new Date();
-    const listaColumnas = columnas.querySelectorAll("[data-columna]")
-    const resumenTablero = tablero.resumen(ahora)
+    const listaColumnas = columnas.querySelectorAll("[data-columna]");
+    const resumenTablero = tablero.resumen(ahora);
 
-    const progreso = raiz.querySelector('[data-dato="progreso"]')
-    if (progreso){
+    const progreso = raiz.querySelector('[data-dato="progreso"]');
+    if (progreso) {
       const total = resumenTablero.porHacer + resumenTablero.enCurso + resumenTablero.hecho;
       const hechas = resumenTablero.hecho;
       const porcentaje = total === 0 ? 0 : Math.round((hechas / total) * 100);
-      progreso.textContent = `${porcentaje} %`
-
+      progreso.textContent = `${porcentaje} %`;
     }
 
-    const vencidas = raiz.querySelector('[data-dato="vencidas"]')
-    if (vencidas){
-      const nvencidas = resumenTablero.vencidas
-      vencidas.textContent = `${nvencidas}`
+    const vencidas = raiz.querySelector('[data-dato="vencidas"]');
+    if (vencidas) {
+      const nvencidas = resumenTablero.vencidas;
+      vencidas.textContent = `${nvencidas}`;
     }
 
-    //Recorremos las columnas de la lista de columnas del html                                                  
-    for (const col of listaColumnas){
+    //Recorremos las columnas de la lista de columnas del html
+    for (const col of listaColumnas) {
       const nombreCol = col.dataset.columna;
-      const colLista = col.querySelector(".lista")
-      const colObjeto = tablero.columna(nombreCol)
-      const tareasOrdenadas = colObjeto.ordenadas()
-      pintarLista(colLista,tareasOrdenadas,ahora)
+      const colLista = col.querySelector(".lista");
+      const colObjeto = tablero.columna(nombreCol);
+      const tareasOrdenadas = colObjeto.ordenadas();
+      pintarLista(colLista, tareasOrdenadas, ahora);
 
       //contadores en columna si tiene limite y si no
-      const colContador= col.querySelector(".contador")
-      if (colObjeto.limiteWip !== null){
-        colContador.textContent=`(${tareasOrdenadas.length}/${colObjeto.limiteWip})`
-      } else{
-        colContador.textContent=`(${tareasOrdenadas.length})`
+      const colContador = col.querySelector(".contador");
+      if (colObjeto.limiteWip !== null) {
+        colContador.textContent = `(${tareasOrdenadas.length}/${colObjeto.limiteWip})`;
+      } else {
+        colContador.textContent = `(${tareasOrdenadas.length})`;
       }
-      
-      const listaTarjetas = colLista.querySelectorAll(".tarjeta")
+
+      const listaTarjetas = colLista.querySelectorAll(".tarjeta");
       const accionesPermitidas = ACCIONES[nombreCol] || [];
-      for (const tarjeta of listaTarjetas){
-        for (const [texto, accion] of accionesPermitidas){
-          const boton = document.createElement("button")
-          boton.textContent = texto
-          boton.dataset.accion = accion
-          boton.type="button";
-          tarjeta.append(boton)
+      for (const tarjeta of listaTarjetas) {
+        for (const [texto, accion] of accionesPermitidas) {
+          const boton = document.createElement("button");
+          boton.textContent = texto;
+          boton.dataset.accion = accion;
+          boton.type = "button";
+          tarjeta.append(boton);
         }
       }
     }
@@ -115,72 +112,57 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
   //   Cualquier otro error → se relanza (es un fallo del programa).
   //   Pista: una función cambiar(accion) con el try/catch te sirve también para el B6.
 
-
-  
-  delegar(columnas,"click","[data-accion]", (boton)=> {
-    try{
-      const id= Number(boton.closest("[data-id]").dataset.id);
-      
-      console.log(id,boton.dataset.accion);
-
-      if(boton.dataset.accion==="empezar"){
-        tablero.mover(id,"En curso");
+  delegar(columnas, "click", "[data-accion]", (boton) => {
+    try {
+      const id = Number(boton.closest("[data-id]").dataset.id);
+      if (boton.dataset.accion === "empezar") {
+        tablero.mover(id, "En curso");
       }
 
-      
-      if(boton.dataset.accion==="volver"){
-        tablero.mover(id,"Por hacer");
+      if (boton.dataset.accion === "volver") {
+        tablero.mover(id, "Por hacer");
       }
 
-      if(boton.dataset.accion==="completar"){
+      if (boton.dataset.accion === "completar") {
         tablero.completar(id);
       }
       alCambiar(tablero);
       avisar("");
       pintar();
-    }
-
-    catch (error){
-      if (error instanceof ErrorTablero){
+    } catch (error) {
+      if (error instanceof ErrorTablero) {
         avisar(error.message);
-      }
-      else{
+      } else {
         throw error;
       }
     }
-
-  })
-
+  });
 
   // ✍️ B6 · submit de `form`: preventDefault, leerFormulario, validar y mostrarErrores. Si hay errores,
   //   no se crea nada. Si no, tablero.crearTarea(datos) (como un cambio más) y form.reset().
 
-  form.addEventListener("submit",(evento)=>{
-    
-    try{
+  form.addEventListener("submit", (evento) => {
+    try {
       evento.preventDefault();
       const datos = leerFormulario(form);
       const errores = validar(datos);
-      mostrarErrores(form,errores);
+      mostrarErrores(form, errores);
 
-      if (Object.keys(errores).length===0){
+      if (Object.keys(errores).length === 0) {
         tablero.crearTarea(datos);
         alCambiar(tablero);
         avisar("");
         pintar();
-        form.reset()
+        form.reset();
       }
-    }
-
-    catch (error){
-      if (error instanceof ErrorTablero){
-        avisar(error.message)
-      }
-      else{
+    } catch (error) {
+      if (error instanceof ErrorTablero) {
+        avisar(error.message);
+      } else {
         throw error;
-      }      
+      }
     }
-  })
+  });
   pintar();
   return { pintar };
 }

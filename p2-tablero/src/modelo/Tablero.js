@@ -6,6 +6,9 @@ import { ColumnaLlenaError, MovimientoNoPermitidoError } from "./errores.js";
 import { Tarea } from "./Tarea.js";
 import { TareaRecurrente } from "./TareaRecurrente.js";
 import { aDatos, desdeDatos } from "./serializar.js";
+import { TareaConAgenda } from "./TareaConAgenda.js";
+import { ErrorTablero } from "./errores.js";
+
 
 export class Tablero {
   static COLUMNAS = Object.freeze(["Por hacer", "En curso", "Hecho"]);
@@ -47,14 +50,20 @@ export class Tablero {
   //   y la devuelve. datos es un objeto { titulo, prioridad, limite, cadaDias }: saca cada campo
   //   y pásaselo al constructor, en su orden (new Tarea(datos) NO vale: espera el título)
   crearTarea(datos) {
-    if (!datos.cadaDias) {
+    if (!datos.cadaDias && !datos.duracion) {
       return this.#columnas
         .get("Por hacer")
         .añadir(new Tarea(datos.titulo, datos.prioridad, datos.limite));
-    } else {
+    } else if (datos.cadaDias && !datos.duracion){
       return this.#columnas
         .get("Por hacer")
         .añadir(new TareaRecurrente(datos.titulo, datos.prioridad, datos.limite, datos.cadaDias));
+    } else if (!datos.cadaDias && datos.duracion) {
+      return this.#columnas
+        .get("Por hacer")
+        .añadir(new TareaConAgenda(datos.titulo, datos.prioridad, datos.limite, datos.duracion));
+    } else{
+      throw new ErrorTablero(`Estás intentando crear una tarea con datos incompatibles.`)
     }
   }
 

@@ -97,6 +97,7 @@ export class Tablero {
       }
     return this.#trasladar(id, destino);
   }
+}
 
   // completar(id): la mueve a «Hecho» y añade a «Por hacer» lo que devuelva tarea.alCompletar()
   //   ⚠️ Sin preguntar si es recurrente: eso es el polimorfismo
@@ -126,7 +127,7 @@ export class Tablero {
   //     MovimientoNoPermitidoError. Todo se comprueba ANTES de tocar nada.
   //   Pista: mover y completar hacen casi lo mismo. Un método privado #trasladar(id, destino)
   //   con las comprobaciones evita escribirlas dos veces.
-  #trasladar(id, destino) {
+  #trasladar(id, destino){
     const columnaOrigen = this.dondeEsta(id);
     if (columnaOrigen === null) throw new Error(`No existe el id: ${id}`);
     if (columnaOrigen.nombre === "Hecho")
@@ -177,7 +178,6 @@ export class Tablero {
     return tablero;
   }
 }
-
 // Comprueba con:  docker compose run --rm web npm test bloque-a
 (void Columna,
   ColumnaLlenaError,

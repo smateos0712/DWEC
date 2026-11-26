@@ -5,6 +5,7 @@ import { ErrorTablero } from "../modelo/errores.js";
 import { delegar } from "./delegacion.js";
 import { leerFormulario, mostrarErrores } from "./formulario.js";
 import { pintarLista } from "./tarjeta.js";
+import { fechaATexto } from "../modelo/serializar.js";
 
 /** Botones de cada tarjeta según su columna: [texto, data-accion] */
 const ACCIONES = {
@@ -89,6 +90,9 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
       const accionesPermitidas = ACCIONES[nombreCol] || [];
       for (const tarjeta of listaTarjetas) {
         for (const [texto, accion] of accionesPermitidas) {
+          if (colObjeto.nombre === "Por hacer" && tablero.buscar(Number(tarjeta.dataset.id)).limite){
+            tarjeta.append(crearBoton("Cambiar fecha y empezar", "fecha"));
+          }
           const boton = document.createElement("button");
           boton.textContent = texto;
           boton.dataset.accion = accion;
@@ -125,6 +129,16 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
 
       if (boton.dataset.accion === "completar") {
         tablero.completar(id);
+      }
+
+      if (boton.dataset.accion==="fecha"){
+        columnas.querySelector("form")?.remove();
+        const tarea = tablero.buscar(id);
+        crearFormulario(tarea);
+      }
+
+      if (boton.dataset.accion==="cancelar"){
+        return columnas.querySelector("form")?.remove();
       }
       alCambiar(tablero);
       avisar("");
@@ -166,5 +180,29 @@ export function iniciarApp(raiz, tablero, { hoy = null, alCambiar = () => {} } =
   pintar();
   return { pintar };
 }
+function crearBoton(texto, accion) {
+  const boton = document.createElement("button");   // 1. crea un <button> vacío (aún no está en la página)
+  boton.type = "button";                              // 2. type="button": así NO envía el formulario
+  boton.textContent = texto;                          // 3. el texto que se ve
+  boton.dataset.accion = accion;                      // 4. data-accion="…": lo que lee tu listener de clics
+  return boton;                                       // 5. lo devuelve; quien la llama decide dónde ponerlo (append)
+}
+
+const crear = (etiqueta, datos) => Object.assign(document.createElement(etiqueta), datos);
+
+function crearFormulario(tarea) {
+  const form = crear("form", { noValidate: true });
+  form.dataset.form = "fecha";
+  const etiqueta = crear("label", { textContent: `Fecha límite nueva de «${tarea.titulo}»` });
+  etiqueta.append(
+    crear("input", { name: "limite", type: "date", value: fechaATexto(tarea.limite) }),
+  );
+  const error = crear("p", { className: "error" });
+  error.dataset.errorDe = "limite";
+  const enviar = crear("button", { type: "submit", textContent: "Guardar" });
+  form.append(etiqueta, error, enviar, crearBoton("Cancelar", "cancelar"));
+  return form;
+}
+
 
 (void ACCIONES, ErrorTablero, delegar, leerFormulario, mostrarErrores, pintarLista); // (borra esta línea cuando los uses)

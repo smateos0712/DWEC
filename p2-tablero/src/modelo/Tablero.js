@@ -2,7 +2,7 @@
 // En el bloque C volverás aquí para ✍️ C4 (toJSON y desdeJSON).
 // El tablero TIENE tres columnas: es composición, no hereda de nadie.
 import { Columna } from "./Columna.js";
-import { ColumnaLlenaError, MovimientoNoPermitidoError } from "./errores.js";
+import { AgendaNoValidaError, ColumnaLlenaError, MovimientoNoPermitidoError } from "./errores.js";
 import { Tarea } from "./Tarea.js";
 import { TareaRecurrente } from "./TareaRecurrente.js";
 import { aDatos, desdeDatos } from "./serializar.js";
@@ -88,6 +88,13 @@ export class Tablero {
   // mover(id, destino): Error si no existe la tarea · Error si la columna destino está llena
   //   (¡comprueba ANTES de quitarla de su columna, o se perdería!) · la mueve y la devuelve
   mover(id, destino) {
+    const origen = this.dondeEsta(id);
+    const tarea = this.buscar(id);
+    
+    if(tarea instanceof (TareaConAgenda)){
+      if (tarea.comprobarPaso(origen, destino)){
+        return this.#trasladar(id, destino);
+      }
     return this.#trasladar(id, destino);
   }
 

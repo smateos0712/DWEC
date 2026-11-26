@@ -78,6 +78,7 @@ export class Tarea {
   alCompletar() {
     return [];
   }
+  
 
   toString() {
     const limite = this.limite ? ` · límite ${formatear(this.limite)}` : "";
